@@ -8,7 +8,10 @@ import { LiveTracker } from './components/LiveTracker';
 import { PlanView } from './components/PlanView';
 import { SettingsView } from './components/SettingsView';
 import { SportPicker } from './components/SportPicker';
+import { TimerView } from './components/TimerView';
 import { isSportId } from './domain/sports';
+import { TIMER_MODES, type TimerMode } from './domain/timer';
+import { WOD_FORMATS, type WodFormat } from './domain/types';
 import { navigate, useRoute } from './hooks/useRoute';
 import { useStore } from './hooks/useStore';
 import type { Database } from './storage/database';
@@ -53,13 +56,22 @@ export function App({ database }: { database?: Database }) {
         break;
       }
       const plan = store.data.plans.find((p) => p.id === route.query.get('plan'));
+      const q = route.query;
+      const format = q.get('format');
+      const prefill = {
+        title: q.get('titre') ?? undefined,
+        durationSeconds: Number(q.get('duree')) || undefined,
+        format: format && (WOD_FORMATS as readonly string[]).includes(format) ? (format as WodFormat) : undefined,
+        score: q.get('score') ?? undefined,
+      };
       title = plan ? 'Valider la séance' : 'Nouvelle séance';
       back = plan ? '/plan' : '/ajouter';
       content = (
         <ActivityForm
-          key={`${id}-${plan?.id ?? ''}`}
+          key={`${id}-${plan?.id ?? ''}-${q.toString()}`}
           sport={id}
           plan={plan}
+          prefill={prefill}
           onCancel={() => history.back()}
           onSubmit={(input) => {
             const a = store.addActivity(input);
@@ -70,6 +82,11 @@ export function App({ database }: { database?: Database }) {
       );
       break;
     }
+    case 'chrono':
+      title = 'Chrono';
+      back = '/ajouter';
+      content = <TimerView key={id ?? ''} mode={(TIMER_MODES as readonly string[]).includes(id ?? '') ? (id as TimerMode) : undefined} />;
+      break;
     case 'gps':
       title = 'Enregistrement';
       back = '/ajouter';
@@ -143,7 +160,7 @@ export function App({ database }: { database?: Database }) {
       content = <p className="card muted">Page introuvable.</p>;
   }
 
-  const activeTab = section === 'activite' ? 'journal' : section === 'gps' ? 'ajouter' : section;
+  const activeTab = section === 'activite' ? 'journal' : section === 'gps' || section === 'chrono' ? 'ajouter' : section;
 
   return (
     <div className="app">

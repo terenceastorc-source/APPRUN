@@ -1,4 +1,5 @@
 import { CATEGORIES, CATEGORY_LABELS, SPORTS, SPORT_IDS } from '../domain/sports';
+import { TIMER_LABELS, TIMER_MODES } from '../domain/timer';
 import { navigate } from '../hooks/useRoute';
 
 export function SportPicker() {
@@ -13,6 +14,18 @@ export function SportPicker() {
             <button key={s} className="sport-tile" onClick={() => navigate(`/gps/${s}`)}>
               <span aria-hidden="true">{SPORTS[s].icon}</span>
               {SPORTS[s].label}
+            </button>
+          ))}
+        </div>
+      </section>
+      <section className="card">
+        <h2>⏱️ Chronos d'entraînement</h2>
+        <p className="muted small">Minuteur avec bips pour tes WOD, HYROX et intervalles. Le résultat s'enregistre en séance.</p>
+        <div className="sport-grid">
+          {TIMER_MODES.map((m) => (
+            <button key={m} className="sport-tile" onClick={() => navigate(`/chrono/${m}`)}>
+              <span aria-hidden="true">{m === 'tabata' ? '🔁' : m === 'emom' ? '⏰' : m === 'intervals' ? '↔️' : m === 'amrap' ? '🔄' : '⏱️'}</span>
+              {TIMER_LABELS[m]}
             </button>
           ))}
         </div>

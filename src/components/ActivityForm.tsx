@@ -21,10 +21,19 @@ import {
 import { validateActivity, type Errors } from '../domain/validation';
 import { FieldError, RPE_LABELS, Scale } from './ui';
 
+/** Valeurs pré-remplies (venant d'un chrono, par exemple). */
+export interface ActivityPrefill {
+  title?: string;
+  durationSeconds?: number;
+  format?: WodFormat;
+  score?: string;
+}
+
 interface Props {
   sport: SportId;
   initial?: Activity;
   plan?: PlannedSession;
+  prefill?: ActivityPrefill;
   onSubmit(input: ActivityInput): void;
   onCancel(): void;
 }
@@ -36,7 +45,7 @@ const LIFTS = ['Back Squat', 'Front Squat', 'Deadlift', 'Clean', 'Clean & Jerk',
 const secToInput = (s?: number) => (s ? formatDuration(s) : '');
 const numToInput = (n?: number) => (n === undefined ? '' : String(n).replace('.', ','));
 
-export function ActivityForm({ sport: initialSport, initial, plan, onSubmit, onCancel }: Props) {
+export function ActivityForm({ sport: initialSport, initial, plan, prefill, onSubmit, onCancel }: Props) {
   const uid = useId();
   const id = (name: string) => `${uid}-${name}`;
   const today = toIsoDate(new Date());
@@ -45,8 +54,10 @@ export function ActivityForm({ sport: initialSport, initial, plan, onSubmit, onC
   const info = SPORTS[sport];
   const [date, setDate] = useState(initial?.date ?? (plan && plan.date <= today ? plan.date : today));
   const [startTime, setStartTime] = useState(initial?.startTime ?? '');
-  const [title, setTitle] = useState(initial?.title ?? plan?.title ?? '');
-  const [duration, setDuration] = useState(secToInput(initial?.durationSeconds) || (plan?.targetDurationMin ? formatDuration(plan.targetDurationMin * 60) : ''));
+  const [title, setTitle] = useState(initial?.title ?? plan?.title ?? prefill?.title ?? '');
+  const [duration, setDuration] = useState(
+    secToInput(initial?.durationSeconds ?? prefill?.durationSeconds) || (plan?.targetDurationMin ? formatDuration(plan.targetDurationMin * 60) : ''),
+  );
   const [rpe, setRpe] = useState(initial?.rpe);
   const [hrAvg, setHrAvg] = useState(numToInput(initial?.heartRateAvg));
   const [hrMax, setHrMax] = useState(numToInput(initial?.heartRateMax));
@@ -57,11 +68,11 @@ export function ActivityForm({ sport: initialSport, initial, plan, onSubmit, onC
   const [elevation, setElevation] = useState(numToInput(initial?.elevationGain));
   const [runType, setRunType] = useState<RunType | ''>(initial?.runType ?? '');
   // CrossFit
-  const [format, setFormat] = useState<WodFormat>(initial?.crossfit?.format ?? 'for-time');
+  const [format, setFormat] = useState<WodFormat>(initial?.crossfit?.format ?? prefill?.format ?? 'for-time');
   const [level, setLevel] = useState<WodLevel>(initial?.crossfit?.level ?? 'rx');
   const [wodName, setWodName] = useState(initial?.crossfit?.wodName ?? '');
   const [workout, setWorkout] = useState(initial?.crossfit?.workout ?? '');
-  const [score, setScore] = useState(initial?.crossfit?.score ?? '');
+  const [score, setScore] = useState(initial?.crossfit?.score ?? prefill?.score ?? '');
   const [lifts, setLifts] = useState<{ exercise: string; sets: string; reps: string; weight: string }[]>(
     (initial?.crossfit?.lifts ?? []).map((l) => ({ exercise: l.exercise, sets: String(l.sets), reps: String(l.reps), weight: numToInput(l.weightKg) })),
   );
