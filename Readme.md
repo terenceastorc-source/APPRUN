@@ -1,5 +1,7 @@
 # APPRUN 🏃
 
+👉 **Application en ligne : https://terenceastorc-source.github.io/APPRUN/**
+
 Application web mobile (PWA) de **suivi de courses à pied** : enregistre tes sorties, suis ton kilométrage, ton allure, tes records et ton objectif hebdomadaire. Fonctionne hors ligne et s'installe sur l'écran d'accueil du téléphone.
 
 ## Fonctionnalités
@@ -21,7 +23,7 @@ npm run build      # vérification des types + build de production dans dist/
 npm run preview    # sert le build (service worker actif)
 ```
 
-Pour l'installer sur un téléphone, déploie le dossier `dist/` sur un hébergement HTTPS (GitHub Pages, Netlify…) puis utilise « Ajouter à l'écran d'accueil ».
+L'application est déployée automatiquement sur GitHub Pages à chaque push sur `main` (workflow `.github/workflows/deploy.yml`). Sur le téléphone, ouvre l'adresse ci-dessus puis « Ajouter à l'écran d'accueil ».
 
 ## Architecture
 
