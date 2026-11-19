@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDuration, formatHours, formatPace, paceSecondsPerKm, parseDuration, parseKm, parseLocalDate, speedKmh, toIsoDate } from './format';
+import { formatAxisDuration, formatDuration, formatHours, formatPace, paceSecondsPerKm, parseDuration, parseKm, parseLocalDate, speedKmh, toIsoDate } from './format';
 
 describe('formatDuration', () => {
   it.each([
@@ -70,5 +70,12 @@ describe('formatHours', () => {
   it('heures et minutes avec espaces insécables', () => {
     expect(formatHours(2700)).toBe('45 min');
     expect(formatHours(11580)).toBe('3 h 13');
+  });
+});
+
+describe('formatAxisDuration', () => {
+  it('compact au-delà de l’heure', () => {
+    expect(formatAxisDuration(3510)).toBe('58:30');
+    expect(formatAxisDuration(3892)).toBe('1h05');
   });
 });

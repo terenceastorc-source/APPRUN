@@ -82,6 +82,21 @@ export function Dashboard({ data, activities, today = new Date() }: Props) {
         </div>
       </section>
 
+      <nav className="quick-actions" aria-label="Raccourcis">
+        <button onClick={() => navigate('/chrono/amrap')}>
+          <span aria-hidden="true">⏱️</span>Chrono
+        </button>
+        <button onClick={() => navigate('/gps/course')}>
+          <span aria-hidden="true">📍</span>GPS
+        </button>
+        <button onClick={() => navigate('/programmes')}>
+          <span aria-hidden="true">🗓️</span>Programmes
+        </button>
+        <button onClick={() => navigate('/progres/course')}>
+          <span aria-hidden="true">📈</span>Progrès
+        </button>
+      </nav>
+
       <Card title="Forme et charge" action={<span className={`status status-${load.status}`}>{LOAD_STATUS_LABELS[load.status]}</span>}>
         <p className="muted small">
           Charge 7 jours <b>{load.acute}</b> · moyenne 4 semaines <b>{Math.round(load.chronic)}</b>

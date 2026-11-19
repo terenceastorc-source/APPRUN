@@ -12,7 +12,7 @@ import {
   stationStats,
   timeInZones,
 } from '../domain/analytics';
-import { formatDate, formatDuration, formatHours, formatKm, formatNumber, formatPace, parseLocalDate } from '../domain/format';
+import { formatAxisDuration, formatDate, formatDuration, formatHours, formatKm, formatNumber, formatPace, parseLocalDate } from '../domain/format';
 import { navigate } from '../hooks/useRoute';
 import type { Store } from '../hooks/useStore';
 import { BodyView } from './BodyView';
@@ -194,7 +194,7 @@ function CrossfitProgress({ store }: { store: Store }) {
                   zeroBased={false}
                   series={[{ key: 's', label: wod, color: '--series-2', values: history.points.map((p) => (amrap ? p.value / 1000 : p.value)) }]}
                   formatValue={fmt}
-                  formatAxis={(v) => (amrap ? formatNumber(Math.round(v * 10) / 10) : formatDuration(v))}
+                  formatAxis={(v) => (amrap ? formatNumber(Math.round(v * 10) / 10) : formatAxisDuration(v))}
                 />
                 <p className="muted small hint">
                   {history.lowerIsBetter ? 'Temps : plus bas = meilleur.' : 'Tours : plus haut = meilleur.'} {history.points.length} tentative{history.points.length > 1 ? 's' : ''}
@@ -282,6 +282,7 @@ function RaceProgress({ store }: { store: Store }) {
           zeroBased={false}
           series={[{ key: 't', label: 'Temps', color: '--series-3', values: history.map((h) => h.seconds) }]}
           formatValue={(v) => formatDuration(v)}
+          formatAxis={formatAxisDuration}
         />
         <p className="muted small hint">Plus bas = plus rapide. Les entraînements partiels faussent la courbe : renseigne le type (entraînement / officielle).</p>
       </Card>

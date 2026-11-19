@@ -1,6 +1,6 @@
 {
   "name": "apprun",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "APPRUN – application web mobile (PWA) de suivi multi-sport",
   "scripts": {
     "dev": "vite",

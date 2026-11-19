@@ -12,6 +12,9 @@ Application web mobile (PWA) de **suivi complet des activités sportives** : end
 | **Saisie adaptée au sport** | Endurance : distance, D+, type de sortie, allure ou vitesse calculée (min/km, km/h, min/100 m). CrossFit : format (For Time, AMRAP, EMOM…), RX/Scaled, benchmark, score, exercices de force avec 1RM estimé. HYROX / ATH X : course officielle ou entraînement, division, classement, temps par segment (modèle HYROX 8 × 1 km + 8 ateliers). |
 | **GPS en direct** | Chrono, distance, allure moyenne et instantanée, carte OpenStreetMap, temps au km, pause/reprise, écran maintenu allumé, reprise après rechargement |
 | **Tableau de bord** | Bilan de la semaine, charge d'entraînement (sRPE) avec ratio aiguë/chronique, temps par semaine et par catégorie, répartition par sport, records (course, HYROX/ATH X, benchmarks CrossFit, charges max) |
+| **Chronos** | For Time (time cap, compteur de tours), AMRAP, EMOM, Tabata, intervalles : bips 3-2-1, vibrations, écran allumé, résultat enregistré en séance |
+| **Programmes** | 10 km (8 sem.), semi-marathon (10 sem.), préparation HYROX (8 sem.), base CrossFit (6 sem.) ; 3 niveaux ; calés sur la date de course ; suivi de l'avancement |
+| **Progrès** | Prédictions 5 km → marathon (Riegel), km et allure par mois, zones cardiaques ; progression par benchmark et 1RM estimé ; HYROX/ATH X : temps total et atelier à travailler |
 | **Plan** | Calendrier mensuel, séances planifiées, validation « Fait ✓ » qui pré-remplit la séance, objectifs par sport/catégorie (km, heures, séances, charge) par semaine/mois/année |
 | **Corps** | Poids, sommeil, FC au repos, forme ressentie, courbes sur 30 jours / 3 mois / 1 an |
 | **Données** | Sauvegarde complète JSON (traces GPS incluses), export CSV, import, migration automatique des données de la v1 |
@@ -43,6 +46,9 @@ src/
     geo.ts        Haversine, filtrage GPS, splits, D+
     recorder.ts   Machine à états de l'enregistrement GPS
     validation.ts Règles de saisie
+    timer.ts      Moteur des chronos (phases, pause)
+    analytics.ts  Prédictions, zones FC, historiques de progression
+    programs.ts   Catalogue et planification des programmes
   storage/
     database.ts   Document JSON versionné (localStorage) + migrations
     tracks.ts     Traces GPS (IndexedDB)
