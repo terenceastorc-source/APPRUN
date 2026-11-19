@@ -19,6 +19,12 @@
   --series-1: #2a78d6;
   --series-2: #eb6834;
   --series-3: #1baf7a;
+  /* Zones cardiaques : rampe séquentielle (une teinte, clair → foncé). */
+  --zone-1: #9ec5f4;
+  --zone-2: #6da7ec;
+  --zone-3: #3987e5;
+  --zone-4: #256abf;
+  --zone-5: #104281;
   --radius: 14px;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(0 0 0 / 0.04);
   color-scheme: light;
@@ -46,6 +52,11 @@
     --series-1: #3987e5;
     --series-2: #d95926;
     --series-3: #199e70;
+    --zone-1: #184f95;
+    --zone-2: #256abf;
+    --zone-3: #3987e5;
+    --zone-4: #6da7ec;
+    --zone-5: #b7d3f6;
     color-scheme: dark;
   }
 }
@@ -306,3 +317,6 @@ legend { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; padding: 0
 .timer-actions { display: flex; gap: 10px; width: 100%; margin-top: auto; }
 .laps { list-style: none; padding: 0; margin: 0; width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
 .laps li { background: var(--surface); border-radius: 8px; padding: 6px 8px; display: flex; justify-content: space-between; }
+
+.segmented.full { display: grid; grid-template-columns: repeat(4, 1fr); align-self: stretch; }
+.segmented.full button { padding: 8px 4px; }

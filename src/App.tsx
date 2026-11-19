@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ActivityDetail } from './components/ActivityDetail';
 import { ActivityForm } from './components/ActivityForm';
-import { BodyView } from './components/BodyView';
 import { Dashboard } from './components/Dashboard';
 import { Journal } from './components/Journal';
 import { LiveTracker } from './components/LiveTracker';
 import { PlanView } from './components/PlanView';
+import { PROGRESS_TABS, ProgressView, type ProgressTab } from './components/ProgressView';
 import { SettingsView } from './components/SettingsView';
 import { SportPicker } from './components/SportPicker';
 import { TimerView } from './components/TimerView';
@@ -22,7 +22,7 @@ const TABS = [
   { path: 'journal', label: 'Journal', icon: '📒' },
   { path: 'ajouter', label: 'Ajouter', icon: '➕' },
   { path: 'plan', label: 'Plan', icon: '📅' },
-  { path: 'corps', label: 'Corps', icon: '❤️' },
+  { path: 'progres', label: 'Progrès', icon: '📈' },
 ] as const;
 
 export function App({ database }: { database?: Database }) {
@@ -148,9 +148,12 @@ export function App({ database }: { database?: Database }) {
       content = <PlanView store={store} />;
       break;
     case 'corps':
-      title = 'Corps et récupération';
-      content = <BodyView store={store} />;
+    case 'progres': {
+      title = 'Progrès';
+      const tab = section === 'corps' ? 'corps' : PROGRESS_TABS.some((t) => t.id === id) ? (id as ProgressTab) : 'course';
+      content = <ProgressView store={store} tab={tab} />;
       break;
+    }
     case 'reglages':
       title = 'Réglages';
       back = '/';
@@ -160,7 +163,7 @@ export function App({ database }: { database?: Database }) {
       content = <p className="card muted">Page introuvable.</p>;
   }
 
-  const activeTab = section === 'activite' ? 'journal' : section === 'gps' || section === 'chrono' ? 'ajouter' : section;
+  const activeTab = section === 'activite' ? 'journal' : section === 'gps' || section === 'chrono' ? 'ajouter' : section === 'corps' ? 'progres' : section;
 
   return (
     <div className="app">
