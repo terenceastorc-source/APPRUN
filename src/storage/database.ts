@@ -93,6 +93,21 @@ export class Database {
     return p;
   }
 
+  /** Ajoute plusieurs séances d'un coup (programme d'entraînement). */
+  addPlans(plans: Omit<PlannedSession, 'id'>[]): number {
+    for (const plan of plans) this.data.plans.push(stripEmpty({ ...plan, id: this.newId() }));
+    this.save();
+    return plans.length;
+  }
+
+  /** Retire un programme : supprime ses séances non réalisées, garde l'historique des séances faites. */
+  removeProgram(instanceId: string): number {
+    const before = this.data.plans.length;
+    this.data.plans = this.data.plans.filter((p) => p.program?.instanceId !== instanceId || p.activityId);
+    this.save();
+    return before - this.data.plans.length;
+  }
+
   updatePlan(id: string, plan: Omit<PlannedSession, 'id'>): void {
     const i = this.data.plans.findIndex((p) => p.id === id);
     if (i < 0) throw new Error(`Séance introuvable : ${id}`);

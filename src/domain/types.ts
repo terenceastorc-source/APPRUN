@@ -132,6 +132,16 @@ export interface PlannedSession {
   targetDistanceKm?: number;
   /** Activité réalisée qui correspond à cette séance. */
   activityId?: string;
+  /** Programme d'entraînement dont la séance fait partie. */
+  program?: ProgramTag;
+}
+
+export interface ProgramTag {
+  /** Identifiant du programme (catalogue). */
+  id: string;
+  /** Identifiant de cette inscription au programme (permet de le retirer). */
+  instanceId: string;
+  name: string;
 }
 
 export interface Settings {

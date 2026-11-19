@@ -128,3 +128,11 @@ export function startOfWeek(date: Date): Date {
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
   return d;
 }
+
+/** Durée courte pour un axe de graphique : « 58:30 » sous l'heure, « 1h05 » au-delà. */
+export function formatAxisDuration(totalSeconds: number): string {
+  const s = Math.round(totalSeconds);
+  if (s < 3600) return formatDuration(s);
+  const min = Math.round(s / 60);
+  return `${Math.floor(min / 60)}h${String(min % 60).padStart(2, '0')}`;
+}

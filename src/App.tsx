@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import { ActivityDetail } from './components/ActivityDetail';
 import { ActivityForm } from './components/ActivityForm';
-import { BodyView } from './components/BodyView';
 import { Dashboard } from './components/Dashboard';
 import { Journal } from './components/Journal';
 import { LiveTracker } from './components/LiveTracker';
 import { PlanView } from './components/PlanView';
+import { ProgramsView } from './components/ProgramsView';
+import { PROGRESS_TABS, ProgressView, type ProgressTab } from './components/ProgressView';
 import { SettingsView } from './components/SettingsView';
 import { SportPicker } from './components/SportPicker';
+import { TimerView } from './components/TimerView';
 import { isSportId } from './domain/sports';
+import { TIMER_MODES, type TimerMode } from './domain/timer';
+import { WOD_FORMATS, type WodFormat } from './domain/types';
 import { navigate, useRoute } from './hooks/useRoute';
 import { useStore } from './hooks/useStore';
 import type { Database } from './storage/database';
@@ -19,7 +23,7 @@ const TABS = [
   { path: 'journal', label: 'Journal', icon: '📒' },
   { path: 'ajouter', label: 'Ajouter', icon: '➕' },
   { path: 'plan', label: 'Plan', icon: '📅' },
-  { path: 'corps', label: 'Corps', icon: '❤️' },
+  { path: 'progres', label: 'Progrès', icon: '📈' },
 ] as const;
 
 export function App({ database }: { database?: Database }) {
@@ -53,13 +57,22 @@ export function App({ database }: { database?: Database }) {
         break;
       }
       const plan = store.data.plans.find((p) => p.id === route.query.get('plan'));
+      const q = route.query;
+      const format = q.get('format');
+      const prefill = {
+        title: q.get('titre') ?? undefined,
+        durationSeconds: Number(q.get('duree')) || undefined,
+        format: format && (WOD_FORMATS as readonly string[]).includes(format) ? (format as WodFormat) : undefined,
+        score: q.get('score') ?? undefined,
+      };
       title = plan ? 'Valider la séance' : 'Nouvelle séance';
       back = plan ? '/plan' : '/ajouter';
       content = (
         <ActivityForm
-          key={`${id}-${plan?.id ?? ''}`}
+          key={`${id}-${plan?.id ?? ''}-${q.toString()}`}
           sport={id}
           plan={plan}
+          prefill={prefill}
           onCancel={() => history.back()}
           onSubmit={(input) => {
             const a = store.addActivity(input);
@@ -70,6 +83,11 @@ export function App({ database }: { database?: Database }) {
       );
       break;
     }
+    case 'chrono':
+      title = 'Chrono';
+      back = '/ajouter';
+      content = <TimerView key={id ?? ''} mode={(TIMER_MODES as readonly string[]).includes(id ?? '') ? (id as TimerMode) : undefined} />;
+      break;
     case 'gps':
       title = 'Enregistrement';
       back = '/ajouter';
@@ -126,14 +144,22 @@ export function App({ database }: { database?: Database }) {
       }
       break;
     }
+    case 'programmes':
+      title = 'Programmes';
+      back = id ? '/programmes' : '/plan';
+      content = <ProgramsView store={store} programId={id} onAdded={setFlash} />;
+      break;
     case 'plan':
       title = 'Plan et objectifs';
       content = <PlanView store={store} />;
       break;
     case 'corps':
-      title = 'Corps et récupération';
-      content = <BodyView store={store} />;
+    case 'progres': {
+      title = 'Progrès';
+      const tab = section === 'corps' ? 'corps' : PROGRESS_TABS.some((t) => t.id === id) ? (id as ProgressTab) : 'course';
+      content = <ProgressView store={store} tab={tab} />;
       break;
+    }
     case 'reglages':
       title = 'Réglages';
       back = '/';
@@ -143,7 +169,7 @@ export function App({ database }: { database?: Database }) {
       content = <p className="card muted">Page introuvable.</p>;
   }
 
-  const activeTab = section === 'activite' ? 'journal' : section === 'gps' ? 'ajouter' : section;
+  const activeTab = section === 'programmes' ? 'plan' : section === 'activite' ? 'journal' : section === 'gps' || section === 'chrono' ? 'ajouter' : section === 'corps' ? 'progres' : section;
 
   return (
     <div className="app">

@@ -19,6 +19,12 @@
   --series-1: #2a78d6;
   --series-2: #eb6834;
   --series-3: #1baf7a;
+  /* Zones cardiaques : rampe séquentielle (une teinte, clair → foncé). */
+  --zone-1: #9ec5f4;
+  --zone-2: #6da7ec;
+  --zone-3: #3987e5;
+  --zone-4: #256abf;
+  --zone-5: #104281;
   --radius: 14px;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(0 0 0 / 0.04);
   color-scheme: light;
@@ -46,6 +52,11 @@
     --series-1: #3987e5;
     --series-2: #d95926;
     --series-3: #199e70;
+    --zone-1: #184f95;
+    --zone-2: #256abf;
+    --zone-3: #3987e5;
+    --zone-4: #6da7ec;
+    --zone-5: #b7d3f6;
     color-scheme: dark;
   }
 }
@@ -282,3 +293,44 @@ legend { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; padding: 0
 .toast.ok { background: var(--success-soft); color: var(--success); }
 .toast.error { background: var(--danger-soft); color: var(--danger); }
 .toast.floating { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 600; box-shadow: var(--shadow); white-space: nowrap; }
+
+/* --- Chronos --- */
+.mode-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.mode-tabs button { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-weight: 600; }
+.mode-tabs button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.timer-run {
+  --phase: var(--muted);
+  display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+  min-height: calc(100dvh - 190px); padding: 16px; border-radius: var(--radius);
+  background: color-mix(in srgb, var(--phase) 14%, var(--surface)); border: 2px solid var(--phase);
+}
+.timer-run.phase-work { --phase: var(--success); }
+.timer-run.phase-rest { --phase: var(--series-1); }
+.timer-run.phase-prep { --phase: var(--warning); }
+.timer-mode { margin: 0; color: var(--muted); font-weight: 600; }
+.timer-phase { margin: 0; font-size: 1.4rem; font-weight: 700; color: var(--phase); text-transform: uppercase; letter-spacing: 0.04em; }
+.timer-clock { font-size: clamp(4.5rem, 26vw, 9rem); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -0.03em; }
+.timer-clock.result { font-size: clamp(3.5rem, 18vw, 6rem); margin: 8px 0; }
+.timer-sub { margin: 0; color: var(--muted); font-variant-numeric: tabular-nums; }
+.round-btn { font-size: 1.2rem; padding: 18px 28px; border-radius: 999px; border-width: 2px; }
+.round-btn strong { margin-left: 8px; font-size: 1.5rem; }
+.timer-actions { display: flex; gap: 10px; width: 100%; margin-top: auto; }
+.laps { list-style: none; padding: 0; margin: 0; width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.laps li { background: var(--surface); border-radius: 8px; padding: 6px 8px; display: flex; justify-content: space-between; }
+
+.segmented.full { display: grid; grid-template-columns: repeat(4, 1fr); align-self: stretch; }
+.segmented.full button { padding: 8px 4px; }
+
+/* --- Programmes --- */
+.program-card { display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%; cursor: pointer; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+.program-card:hover { border-color: var(--accent); }
+.program-icon { font-size: 2rem; flex: none; }
+.week-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.week-head { width: 100%; display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: baseline; text-align: left; background: var(--surface-2); color: var(--text); border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.week-head + .plan-list { margin-top: 8px; }
+.check { flex-direction: row; align-items: center; gap: 8px; color: var(--text); font-size: 0.95rem; margin-bottom: 10px; }
+.check input { width: auto; }
+
+.quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.quick-actions button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font-size: 0.78rem; font-weight: 600; cursor: pointer; box-shadow: var(--shadow); }
+.quick-actions button span { font-size: 1.4rem; }

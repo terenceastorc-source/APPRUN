@@ -17,6 +17,8 @@ export interface Store {
   addPlan(plan: Omit<PlannedSession, 'id'>): void;
   updatePlan(id: string, plan: Omit<PlannedSession, 'id'>): void;
   removePlan(id: string): void;
+  addPlans(plans: Omit<PlannedSession, 'id'>[]): number;
+  removeProgram(instanceId: string): number;
   updateSettings(settings: Settings): void;
   importData(data: AppData, mode: 'merge' | 'replace'): number;
   clear(): void;
@@ -51,6 +53,8 @@ export function useStore(database?: Database): Store {
       addPlan: (p) => mutate(() => void db.addPlan(p)),
       updatePlan: (id, p) => mutate(() => db.updatePlan(id, p)),
       removePlan: (id) => mutate(() => db.removePlan(id)),
+      addPlans: (p) => mutate(() => db.addPlans(p)),
+      removeProgram: (i) => mutate(() => db.removeProgram(i)),
       updateSettings: (s) => mutate(() => db.updateSettings(s)),
       importData: (d, m) => mutate(() => db.importData(d, m)),
       clear: () => mutate(() => db.clear()),
