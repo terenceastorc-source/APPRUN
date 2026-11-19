@@ -1,17 +1,20 @@
-# APPRUN 🏃
+# APPRUN 🏃🏋️🔥
 
 👉 **Application en ligne : https://terenceastorc-source.github.io/APPRUN/**
 
-Application web mobile (PWA) de **suivi de courses à pied** : enregistre tes sorties, suis ton kilométrage, ton allure, tes records et ton objectif hebdomadaire. Fonctionne hors ligne et s'installe sur l'écran d'accueil du téléphone.
+Application web mobile (PWA) de **suivi complet des activités sportives** : endurance, CrossFit, HYROX et ATH X. Elle fonctionne hors ligne et s'installe sur l'écran d'accueil du téléphone. Les données restent sur l'appareil.
 
 ## Fonctionnalités
 
-- **Saisie d'une sortie** : date, type (footing, fractionné, sortie longue, tempo, compétition, trail), distance, durée, ressenti (1–5), FC moyenne, dénivelé, notes. Allure et vitesse calculées en direct.
-- **Tableau de bord** : totaux semaine / mois / année / global, objectif hebdomadaire avec barre de progression, série de semaines actives, histogramme du kilométrage sur 12 semaines.
-- **Records** : meilleurs temps sur 5 km, 10 km, semi et marathon (tolérance GPS ±2 %), plus longue sortie, meilleure allure.
-- **Historique** : regroupé par mois, filtre par type, recherche dans les notes, modification et suppression.
-- **Données** : stockées localement sur l'appareil ; export JSON / CSV (compatible Excel), import JSON, effacement.
-- **PWA** : installable, hors ligne, thème clair/sombre automatique.
+| Module | Contenu |
+|---|---|
+| **Sports** | Course à pied, trail, vélo, natation, marche, randonnée, CrossFit, HYROX, ATH X |
+| **Saisie adaptée au sport** | Endurance : distance, D+, type de sortie, allure ou vitesse calculée (min/km, km/h, min/100 m). CrossFit : format (For Time, AMRAP, EMOM…), RX/Scaled, benchmark, score, exercices de force avec 1RM estimé. HYROX / ATH X : course officielle ou entraînement, division, classement, temps par segment (modèle HYROX 8 × 1 km + 8 ateliers). |
+| **GPS en direct** | Chrono, distance, allure moyenne et instantanée, carte OpenStreetMap, temps au km, pause/reprise, écran maintenu allumé, reprise après rechargement |
+| **Tableau de bord** | Bilan de la semaine, charge d'entraînement (sRPE) avec ratio aiguë/chronique, temps par semaine et par catégorie, répartition par sport, records (course, HYROX/ATH X, benchmarks CrossFit, charges max) |
+| **Plan** | Calendrier mensuel, séances planifiées, validation « Fait ✓ » qui pré-remplit la séance, objectifs par sport/catégorie (km, heures, séances, charge) par semaine/mois/année |
+| **Corps** | Poids, sommeil, FC au repos, forme ressentie, courbes sur 30 jours / 3 mois / 1 an |
+| **Données** | Sauvegarde complète JSON (traces GPS incluses), export CSV, import, migration automatique des données de la v1 |
 
 ## Démarrer
 
@@ -23,23 +26,41 @@ npm run build      # vérification des types + build de production dans dist/
 npm run preview    # sert le build (service worker actif)
 ```
 
-L'application est déployée automatiquement sur GitHub Pages à chaque push sur `main` (workflow `.github/workflows/deploy.yml`). Sur le téléphone, ouvre l'adresse ci-dessus puis « Ajouter à l'écran d'accueil ».
+Déploiement automatique sur GitHub Pages à chaque push sur `main` (`.github/workflows/deploy.yml`).
 
 ## Architecture
 
 ```
 src/
-  domain/       Logique métier pure, sans React (formats, statistiques, validation)
-  storage/      Persistance localStorage versionnée + import/export
-  hooks/        useRunStore : relie le dépôt à l'état React
-  components/   Écrans : Dashboard, RunForm, RunList, SettingsPanel, WeeklyChart (SVG)
-  App.tsx       Navigation par onglets (hash, compatible bouton retour)
-public/         Manifest, service worker, icônes
+  domain/       Logique métier pure, testée sans navigateur
+    sports.ts     Catalogue des sports et catégories
+    types.ts      Modèle de données (activités, corps, objectifs, plan)
+    load.ts       Charge sRPE, ratio aiguë/chronique
+    stats.ts      Agrégats par période, catégorie, sport
+    goals.ts      Progression des objectifs
+    records.ts    Records course, HYROX/ATH X, benchmarks, charges
+    hyrox.ts      Modèle de course HYROX
+    geo.ts        Haversine, filtrage GPS, splits, D+
+    recorder.ts   Machine à états de l'enregistrement GPS
+    validation.ts Règles de saisie
+  storage/
+    database.ts   Document JSON versionné (localStorage) + migrations
+    tracks.ts     Traces GPS (IndexedDB)
+    exchange.ts   Import / export
+  hooks/        useStore (état React), useRoute (navigation par hash)
+  components/   Écrans et graphiques SVG
 ```
 
 Choix techniques :
-- **React + TypeScript strict + Vite**, aucune dépendance d'exécution hormis React.
-- Distances en **mètres** et durées en **secondes** (entiers) pour éviter les erreurs d'arrondi ; dates stockées en `AAAA-MM-JJ` local pour éviter les décalages de fuseau.
-- Le dépôt (`RunRepository`) reçoit son stockage, son horloge et son générateur d'id par injection : il est testé sans navigateur.
-- Schéma de stockage versionné (`version: 1`) avec un point de migration prévu ; les données corrompues ou invalides sont ignorées sans faire planter l'app.
-- CI GitHub Actions : typecheck, tests, build.
+- **React + TypeScript strict + Vite**. Leaflet est la seule dépendance ajoutée ; il est chargé à la demande, seulement quand une carte s'affiche.
+- Distances en mètres et durées en secondes (entiers), dates locales `AAAA-MM-JJ` : pas d'erreur d'arrondi ni de décalage de fuseau.
+- **Charge d'entraînement sRPE** (durée × effort perçu 1–10) : une même mesure pour comparer course, CrossFit et HYROX.
+- Schéma versionné (`version: 2`) avec migration depuis la v1 (course seule). Les données invalides sont ignorées sans bloquer l'app.
+- GPS : filtrage des points imprécis, du bruit à l'arrêt et des sauts irréalistes ; la session en cours est sauvegardée pour survivre à un rechargement.
+- Graphiques en SVG maison : palette catégorielle validée pour le daltonisme (clair et sombre), légende, infobulles au survol ou au toucher.
+
+## Limites connues
+
+- Sur téléphone, le navigateur coupe le GPS quand l'écran est verrouillé : l'app demande à garder l'écran allumé (Wake Lock).
+- Les données sont locales à l'appareil : penser à la sauvegarde JSON.
+- Prévu : synchronisation automatique Garmin via Strava (nécessite un petit serveur pour l'authentification).

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDuration, formatPace, paceSecondsPerKm, parseDuration, parseKm, parseLocalDate, speedKmh, toIsoDate } from './format';
+import { formatDuration, formatHours, formatPace, paceSecondsPerKm, parseDuration, parseKm, parseLocalDate, speedKmh, toIsoDate } from './format';
 
 describe('formatDuration', () => {
   it.each([
@@ -63,5 +63,12 @@ describe('dates locales', () => {
   it('aller-retour sans décalage de fuseau', () => {
     expect(toIsoDate(parseLocalDate('2026-03-29'))).toBe('2026-03-29');
     expect(parseLocalDate('2026-01-05').getDay()).toBe(1); // lundi
+  });
+});
+
+describe('formatHours', () => {
+  it('heures et minutes avec espaces insécables', () => {
+    expect(formatHours(2700)).toBe('45 min');
+    expect(formatHours(11580)).toBe('3 h 13');
   });
 });

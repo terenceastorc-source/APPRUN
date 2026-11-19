@@ -1,30 +1,49 @@
 import { describe, expect, it } from 'vitest';
-import type { RunInput } from './types';
-import { validateRun } from './validation';
+import type { ActivityInput } from './types';
+import { validateActivity, validateBody, validatePlan } from './validation';
 
-const valid: RunInput = { date: '2026-11-18', distanceMeters: 10000, durationSeconds: 3000, type: 'footing' };
 const TODAY = '2026-11-19';
+const run: ActivityInput = { sport: 'course', date: '2026-11-18', durationSeconds: 3000, distanceMeters: 10000, source: 'manual' };
 
-describe('validateRun', () => {
-  it('accepte une course valide', () => {
-    expect(validateRun(valid, TODAY)).toEqual({});
-    expect(validateRun({ ...valid, effort: 3, heartRateAvg: 150, elevationGain: 120 }, TODAY)).toEqual({});
+describe('validateActivity', () => {
+  it('accepte une course et un WOD valides', () => {
+    expect(validateActivity(run, TODAY)).toEqual({});
+    expect(validateActivity({ sport: 'crossfit', date: TODAY, durationSeconds: 1200, rpe: 9, source: 'manual', crossfit: { format: 'for-time', level: 'rx', score: '4:30' } }, TODAY)).toEqual({});
   });
 
-  it('refuse une date future ou mal formée', () => {
-    expect(validateRun({ ...valid, date: '2026-11-20' }, TODAY).date).toBeDefined();
-    expect(validateRun({ ...valid, date: '18/11/2026' }, TODAY).date).toBeDefined();
+  it('exige une distance pour l’endurance seulement', () => {
+    expect(validateActivity({ ...run, distanceMeters: undefined }, TODAY).distanceMeters).toBeDefined();
+    expect(validateActivity({ ...run, sport: 'hyrox', distanceMeters: undefined }, TODAY)).toEqual({});
   });
 
-  it('refuse distance et durée invalides', () => {
-    const e = validateRun({ ...valid, distanceMeters: Number.NaN, durationSeconds: 0 }, TODAY);
-    expect(e.distanceMeters).toBeDefined();
-    expect(e.durationSeconds).toBeDefined();
+  it('refuse date future, durée nulle, RPE et FC incohérents, NaN', () => {
+    const e = validateActivity({ ...run, date: '2026-11-20', durationSeconds: 0, rpe: 11, heartRateAvg: 170, heartRateMax: 160, elevationGain: Number.NaN }, TODAY);
+    expect(Object.keys(e).sort()).toEqual(['date', 'durationSeconds', 'elevationGain', 'heartRateMax', 'rpe']);
   });
 
-  it('contrôle les champs optionnels', () => {
-    const e = validateRun({ ...valid, effort: 6, heartRateAvg: 400, elevationGain: -5 }, TODAY);
-    expect(Object.keys(e).sort()).toEqual(['effort', 'elevationGain', 'heartRateAvg']);
-    expect(validateRun({ ...valid, heartRateAvg: Number.NaN }, TODAY).heartRateAvg).toBeDefined();
+  it('valide exercices et segments', () => {
+    const e = validateActivity(
+      { ...run, sport: 'crossfit', distanceMeters: undefined, crossfit: { format: 'force', level: 'rx', lifts: [{ exercise: '', sets: 5, reps: 5 }, { exercise: 'Squat', sets: 0, reps: 5 }] } },
+      TODAY,
+    );
+    expect(e['lift-0']).toBeDefined();
+    expect(e['lift-1']).toBeDefined();
+    const r = validateActivity({ ...run, sport: 'hyrox', distanceMeters: undefined, race: { official: true, segments: [{ name: ' ', kind: 'run' }] } }, TODAY);
+    expect(r['segment-0']).toBeDefined();
+  });
+});
+
+describe('validateBody', () => {
+  it('exige au moins une mesure et des valeurs plausibles', () => {
+    expect(validateBody({ date: TODAY, weightKg: 72.5 }, TODAY)).toEqual({});
+    expect(validateBody({ date: TODAY }, TODAY).weightKg).toBeDefined();
+    expect(Object.keys(validateBody({ date: TODAY, weightKg: 500, sleepHours: 30, form: 0 }, TODAY)).sort()).toEqual(['form', 'sleepHours', 'weightKg']);
+  });
+});
+
+describe('validatePlan', () => {
+  it('exige un titre', () => {
+    expect(validatePlan({ date: TODAY, sport: 'course', title: '  ' }).title).toBeDefined();
+    expect(validatePlan({ date: '2026-12-01', sport: 'hyrox', title: 'Simulation' })).toEqual({});
   });
 });
