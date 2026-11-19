@@ -7,6 +7,7 @@ import { validatePlan, type Errors } from '../domain/validation';
 import { navigate } from '../hooks/useRoute';
 import type { Store } from '../hooks/useStore';
 import { ProgressBar } from './charts';
+import { ActivePrograms } from './ProgramsView';
 import { Card, Empty, FieldError } from './ui';
 
 const WEEKDAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -105,6 +106,7 @@ export function PlanView({ store, today = new Date() }: Props) {
               <span aria-hidden="true">{SPORTS[p.sport].icon}</span>
               <span className="grow">
                 <strong>{p.title}</strong>
+                {p.program && <span className="badge small-badge"> {p.program.name.split(' · ')[0]}</span>}
                 <span className="muted small">
                   {' '}
                   · {p.activityId ? 'réalisée ✓' : p.date < todayIso ? 'non réalisée' : 'prévue'}
@@ -154,13 +156,15 @@ export function PlanView({ store, today = new Date() }: Props) {
             }
             onSubmit={(p) => {
               if (editing === 'new') store.addPlan(p);
-              else store.updatePlan(editing.id, { ...p, activityId: editing.activityId });
+              else store.updatePlan(editing.id, { ...p, activityId: editing.activityId, program: editing.program });
               setSelected(p.date);
               setEditing(null);
             }}
           />
         )}
       </Card>
+
+      <ActivePrograms store={store} today={today} />
 
       <GoalsCard store={store} today={today} />
     </div>

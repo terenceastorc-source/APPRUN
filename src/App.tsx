@@ -5,6 +5,7 @@ import { Dashboard } from './components/Dashboard';
 import { Journal } from './components/Journal';
 import { LiveTracker } from './components/LiveTracker';
 import { PlanView } from './components/PlanView';
+import { ProgramsView } from './components/ProgramsView';
 import { PROGRESS_TABS, ProgressView, type ProgressTab } from './components/ProgressView';
 import { SettingsView } from './components/SettingsView';
 import { SportPicker } from './components/SportPicker';
@@ -143,6 +144,11 @@ export function App({ database }: { database?: Database }) {
       }
       break;
     }
+    case 'programmes':
+      title = 'Programmes';
+      back = id ? '/programmes' : '/plan';
+      content = <ProgramsView store={store} programId={id} onAdded={setFlash} />;
+      break;
     case 'plan':
       title = 'Plan et objectifs';
       content = <PlanView store={store} />;
@@ -163,7 +169,7 @@ export function App({ database }: { database?: Database }) {
       content = <p className="card muted">Page introuvable.</p>;
   }
 
-  const activeTab = section === 'activite' ? 'journal' : section === 'gps' || section === 'chrono' ? 'ajouter' : section === 'corps' ? 'progres' : section;
+  const activeTab = section === 'programmes' ? 'plan' : section === 'activite' ? 'journal' : section === 'gps' || section === 'chrono' ? 'ajouter' : section === 'corps' ? 'progres' : section;
 
   return (
     <div className="app">

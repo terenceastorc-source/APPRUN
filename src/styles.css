@@ -320,3 +320,13 @@ legend { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; padding: 0
 
 .segmented.full { display: grid; grid-template-columns: repeat(4, 1fr); align-self: stretch; }
 .segmented.full button { padding: 8px 4px; }
+
+/* --- Programmes --- */
+.program-card { display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%; cursor: pointer; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+.program-card:hover { border-color: var(--accent); }
+.program-icon { font-size: 2rem; flex: none; }
+.week-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.week-head { width: 100%; display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: baseline; text-align: left; background: var(--surface-2); color: var(--text); border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.week-head + .plan-list { margin-top: 8px; }
+.check { flex-direction: row; align-items: center; gap: 8px; color: var(--text); font-size: 0.95rem; margin-bottom: 10px; }
+.check input { width: auto; }

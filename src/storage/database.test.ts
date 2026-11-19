@@ -114,3 +114,19 @@ describe('migration', () => {
     expect(migrate(v2).body).toEqual([]);
   });
 });
+
+describe('Database — programmes', () => {
+  it('ajoute en lot et retire un programme en gardant les séances réalisées', () => {
+    const { db: d } = db();
+    const tag = { id: '10k', instanceId: 'p1', name: '10 km' };
+    d.addPlans([
+      { date: '2026-11-10', sport: 'course', title: 'A', program: tag },
+      { date: '2026-11-20', sport: 'course', title: 'B', program: tag },
+      { date: '2026-11-21', sport: 'velo', title: 'Perso' },
+    ]);
+    const first = d.snapshot().plans[0]!;
+    d.addActivity({ ...input, planId: first.id });
+    expect(d.removeProgram('p1')).toBe(1);
+    expect(d.snapshot().plans.map((p) => p.title)).toEqual(['A', 'Perso']);
+  });
+});
