@@ -1,0 +1,40 @@
+{
+  "name": "apprun",
+  "version": "0.1.0",
+  "description": "APPRUN – application web mobile (PWA) de suivi de courses à pied",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terenceastorc-source/APPRUN.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/terenceastorc-source/APPRUN/issues"
+  },
+  "homepage": "https://github.com/terenceastorc-source/APPRUN#readme",
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^8.0.0",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.13",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "jsdom": "^31.0.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  },
+  "private": true,
+  "type": "module"
+}
