@@ -1,14 +1,15 @@
-import type { Run } from '../domain/types';
+import type { Activity } from '../domain/types';
 
 let seq = 0;
-export function makeRun(overrides: Partial<Run> = {}): Run {
+export function makeActivity(overrides: Partial<Activity> = {}): Activity {
   seq++;
   return {
-    id: `run-${seq}`,
+    id: `act-${seq}`,
+    sport: 'course',
     date: '2026-11-16',
-    distanceMeters: 10000,
     durationSeconds: 3000,
-    type: 'footing',
+    distanceMeters: 10000,
+    source: 'manual',
     createdAt: `2026-11-16T08:00:${String(seq % 60).padStart(2, '0')}.000Z`,
     updatedAt: '2026-11-16T08:00:00.000Z',
     ...overrides,

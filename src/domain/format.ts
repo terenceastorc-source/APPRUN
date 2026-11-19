@@ -78,3 +78,53 @@ export function toIsoDate(date: Date): string {
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
+
+/** Durée lisible : « 1 h 05 », « 45 min ». */
+export function formatHours(totalSeconds: number): string {
+  const min = Math.round(totalSeconds / 60);
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h === 0) return `${m}\u00a0min`;
+  return `${h}\u00a0h\u00a0${String(m).padStart(2, '0')}`;
+}
+
+/** Allure en min/100 m (natation). */
+export function formatPacePer100m(distanceMeters: number, durationSeconds: number): string {
+  if (distanceMeters <= 0) return '–';
+  const s = durationSeconds / (distanceMeters / 100);
+  return formatPace(s).replace('/km', '/100 m');
+}
+
+/** Allure ou vitesse selon l'unité propre au sport. */
+export function formatSpeedFor(unit: 'min/km' | 'km/h' | 'min/100m' | undefined, distanceMeters: number, durationSeconds: number): string {
+  if (!distanceMeters || !durationSeconds) return '–';
+  if (unit === 'km/h') return `${speedKmh(distanceMeters, durationSeconds).toFixed(1).replace('.', ',')} km/h`;
+  if (unit === 'min/100m') return formatPacePer100m(distanceMeters, durationSeconds);
+  return formatPace(paceSecondsPerKm(distanceMeters, durationSeconds));
+}
+
+const numberFormatter = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+export function formatNumber(n: number): string {
+  return numberFormatter.format(n);
+}
+
+/** Nombre décimal saisi en français (« 72,5 »). Vide → undefined, invalide → NaN. */
+export function parseOptionalNumber(value: string): number | undefined {
+  const t = value.trim().replace(',', '.');
+  if (t === '') return undefined;
+  const n = Number(t);
+  return Number.isFinite(n) ? n : Number.NaN;
+}
+
+export function addDays(date: Date, days: number): Date {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+/** Lundi (00:00) de la semaine contenant la date. */
+export function startOfWeek(date: Date): Date {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return d;
+}
