@@ -23,7 +23,7 @@ export function dailyLoads(activities: readonly Activity[], days: number, today:
   return out;
 }
 
-export type LoadStatus = 'insuffisant' | 'reprise' | 'optimal' | 'eleve' | 'risque';
+export type LoadStatus = 'historique' | 'insuffisant' | 'reprise' | 'optimal' | 'eleve' | 'risque';
 
 export interface LoadState {
   /** Charge des 7 derniers jours. */
@@ -35,6 +35,9 @@ export interface LoadState {
   status: LoadStatus;
 }
 
+/** Historique minimal (jours depuis la première séance) pour que le ratio aiguë/chronique ait un sens. */
+export const MIN_HISTORY_DAYS = 21;
+
 /**
  * État de charge à la date donnée. Repères usuels de l'ACWR :
  * < 0,8 sous-charge, 0,8–1,3 zone optimale, 1,3–1,5 élevée, > 1,5 risque de blessure accru.
@@ -43,6 +46,10 @@ export function loadState(activities: readonly Activity[], today: Date): LoadSta
   const days = dailyLoads(activities, 28, today);
   const acute = days.slice(-7).reduce((s, d) => s + d.load, 0);
   const chronic = days.reduce((s, d) => s + d.load, 0) / 4;
+  // Moins de 3 semaines d'historique : la moyenne sur 4 semaines est sous-estimée et le ratio trompeur.
+  const todayIso = toIsoDate(today);
+  const first = activities.reduce<string | undefined>((m, a) => (a.date <= todayIso && (!m || a.date < m) ? a.date : m), undefined);
+  if (first && first > toIsoDate(addDays(today, -MIN_HISTORY_DAYS))) return { acute, chronic, ratio: null, status: 'historique' };
   if (chronic === 0) return { acute, chronic, ratio: null, status: acute > 0 ? 'reprise' : 'insuffisant' };
   const ratio = acute / chronic;
   const status: LoadStatus = ratio < 0.8 ? 'insuffisant' : ratio <= 1.3 ? 'optimal' : ratio <= 1.5 ? 'eleve' : 'risque';
@@ -50,6 +57,7 @@ export function loadState(activities: readonly Activity[], today: Date): LoadSta
 }
 
 export const LOAD_STATUS_LABELS: Record<LoadStatus, string> = {
+  historique: 'Historique en construction',
   insuffisant: 'Charge basse',
   reprise: 'Reprise',
   optimal: 'Zone optimale',

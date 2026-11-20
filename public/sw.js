@@ -1,6 +1,6 @@
 // Service worker APPRUN : stratégie « réseau d'abord, cache en secours » pour la page,
 // « cache d'abord » pour les ressources statiques (fichiers versionnés par Vite).
-const CACHE = 'apprun-v3';
+const CACHE = 'apprun-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (event) => {
