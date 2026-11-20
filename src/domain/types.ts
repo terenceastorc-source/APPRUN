@@ -147,6 +147,10 @@ export interface ProgramTag {
 export interface Settings {
   /** Fréquence cardiaque maximale (pour les zones). */
   maxHr?: number;
+  /** Adresse du serveur IA (photo du WOD, coach du jour). */
+  aiUrl?: string;
+  /** Code d'accès du serveur IA. */
+  aiCode?: string;
 }
 
 export interface AppData {

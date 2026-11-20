@@ -1,0 +1,12 @@
+name = "apprun-ai"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Origine de l'application (GitHub Pages). Ajoute d'autres origines séparées par des virgules.
+ALLOWED_ORIGINS = "https://terenceastorc-source.github.io"
+
+# Secrets à définir (jamais dans ce fichier) :
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put ACCESS_CODE

@@ -1,11 +1,17 @@
 import { CATEGORIES, CATEGORY_LABELS, SPORTS, SPORT_IDS } from '../domain/sports';
 import { TIMER_LABELS, TIMER_MODES } from '../domain/timer';
 import { navigate } from '../hooks/useRoute';
+import type { Settings } from '../domain/types';
+import { WodPhotoButton } from './WodPhoto';
 
-export function SportPicker() {
+export function SportPicker({ settings }: { settings: Settings }) {
   const gpsSports = SPORT_IDS.filter((s) => SPORTS[s].gps);
   return (
     <div className="stack">
+      <section className="card">
+        <h2>✨ Saisie express</h2>
+        <WodPhotoButton settings={settings} />
+      </section>
       <section className="card">
         <h2>📍 Enregistrer en direct (GPS)</h2>
         <p className="muted small">Chrono, distance, allure et carte du parcours depuis ton téléphone.</p>

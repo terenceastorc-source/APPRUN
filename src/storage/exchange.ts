@@ -12,7 +12,10 @@ export interface ExportFile {
 }
 
 export function exportJson(data: AppData, tracks: StoredTrack[] = []): string {
-  const file: ExportFile = { app: 'apprun', exportedAt: new Date().toISOString(), data, tracks };
+  // Le code d'accès au serveur IA ne quitte pas l'appareil.
+  const { aiCode: _secret, ...settings } = data.settings;
+  void _secret;
+  const file: ExportFile = { app: 'apprun', exportedAt: new Date().toISOString(), data: { ...data, settings }, tracks };
   return JSON.stringify(file);
 }
 

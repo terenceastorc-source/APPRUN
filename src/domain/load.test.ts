@@ -55,6 +55,13 @@ describe('loadState', () => {
     expect(loadState(daily(50, 21, 7), TODAY).status).toBe('insuffisant');
   });
 
+  it('moins de 3 semaines d’historique : pas de ratio ni d’alerte', () => {
+    const s = loadState(daily(60, 5), TODAY);
+    expect(s).toMatchObject({ acute: 300, ratio: null, status: 'historique' });
+    // Une seule séance (cas d'un nouvel utilisateur)
+    expect(loadState(daily(300, 1), TODAY).status).toBe('historique');
+  });
+
   it("historique hebdomadaire de la bonne longueur", () => {
     expect(loadHistory(daily(50, 28), 4, TODAY)).toHaveLength(4);
   });

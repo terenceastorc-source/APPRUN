@@ -27,6 +27,11 @@ export interface ActivityPrefill {
   durationSeconds?: number;
   format?: WodFormat;
   score?: string;
+  wodName?: string;
+  workout?: string;
+  lifts?: Lift[];
+  /** Origine du pré-remplissage, pour prévenir l'athlète de vérifier. */
+  source?: { kind: 'photo'; note: string; confidence: string };
 }
 
 interface Props {
@@ -70,11 +75,11 @@ export function ActivityForm({ sport: initialSport, initial, plan, prefill, onSu
   // CrossFit
   const [format, setFormat] = useState<WodFormat>(initial?.crossfit?.format ?? prefill?.format ?? 'for-time');
   const [level, setLevel] = useState<WodLevel>(initial?.crossfit?.level ?? 'rx');
-  const [wodName, setWodName] = useState(initial?.crossfit?.wodName ?? '');
-  const [workout, setWorkout] = useState(initial?.crossfit?.workout ?? '');
+  const [wodName, setWodName] = useState(initial?.crossfit?.wodName ?? prefill?.wodName ?? '');
+  const [workout, setWorkout] = useState(initial?.crossfit?.workout ?? prefill?.workout ?? '');
   const [score, setScore] = useState(initial?.crossfit?.score ?? prefill?.score ?? '');
   const [lifts, setLifts] = useState<{ exercise: string; sets: string; reps: string; weight: string }[]>(
-    (initial?.crossfit?.lifts ?? []).map((l) => ({ exercise: l.exercise, sets: String(l.sets), reps: String(l.reps), weight: numToInput(l.weightKg) })),
+    (initial?.crossfit?.lifts ?? prefill?.lifts ?? []).map((l) => ({ exercise: l.exercise, sets: String(l.sets), reps: String(l.reps), weight: numToInput(l.weightKg) })),
   );
   // HYROX / ATH X
   const [official, setOfficial] = useState(initial?.race?.official ?? false);
@@ -150,6 +155,12 @@ export function ActivityForm({ sport: initialSport, initial, plan, prefill, onSu
           </h2>
           {plan && <span className="badge">Séance planifiée</span>}
         </div>
+        {prefill?.source?.kind === 'photo' && (
+          <p className="pace-preview" role="status">
+            📷 Rempli depuis ta photo (lecture {prefill.source.confidence}). Vérifie avant d'enregistrer
+            {prefill.source.note ? ` : ${prefill.source.note}` : '.'}
+          </p>
+        )}
         <label htmlFor={id('sport')}>
           Sport
           <select id={id('sport')} value={sport} onChange={(e) => changeSport(e.target.value as SportId)}>

@@ -15,6 +15,7 @@ Application web mobile (PWA) de **suivi complet des activités sportives** : end
 | **Chronos** | For Time (time cap, compteur de tours), AMRAP, EMOM, Tabata, intervalles : bips 3-2-1, vibrations, écran allumé, résultat enregistré en séance |
 | **Programmes** | 10 km (8 sem.), semi-marathon (10 sem.), préparation HYROX (8 sem.), base CrossFit (6 sem.) ; 3 niveaux ; calés sur la date de course ; suivi de l'avancement |
 | **Progrès** | Prédictions 5 km → marathon (Riegel), km et allure par mois, zones cardiaques ; progression par benchmark et 1RM estimé ; HYROX/ATH X : temps total et atelier à travailler |
+| **IA (prototype)** | 📷 Photo du WOD : le tableau de la box devient une séance pré-remplie. 🧠 Coach du jour : recommandation de séance à partir de la charge, du sommeil, de la forme et du plan. Nécessite le serveur IA (`server/`, voir son README) |
 | **Plan** | Calendrier mensuel, séances planifiées, validation « Fait ✓ » qui pré-remplit la séance, objectifs par sport/catégorie (km, heures, séances, charge) par semaine/mois/année |
 | **Corps** | Poids, sommeil, FC au repos, forme ressentie, courbes sur 30 jours / 3 mois / 1 an |
 | **Données** | Sauvegarde complète JSON (traces GPS incluses), export CSV, import, migration automatique des données de la v1 |
@@ -53,6 +54,7 @@ src/
     database.ts   Document JSON versionné (localStorage) + migrations
     tracks.ts     Traces GPS (IndexedDB)
     exchange.ts   Import / export
+  ai/           Contrat avec le serveur IA, client, contexte du coach
   hooks/        useStore (état React), useRoute (navigation par hash)
   components/   Écrans et graphiques SVG
 ```
@@ -64,6 +66,10 @@ Choix techniques :
 - Schéma versionné (`version: 2`) avec migration depuis la v1 (course seule). Les données invalides sont ignorées sans bloquer l'app.
 - GPS : filtrage des points imprécis, du bruit à l'arrêt et des sauts irréalistes ; la session en cours est sauvegardée pour survivre à un rechargement.
 - Graphiques en SVG maison : palette catégorielle validée pour le daltonisme (clair et sombre), légende, infobulles au survol ou au toucher.
+
+## Serveur IA
+
+Le dossier [`server/`](server/README.md) contient un Cloudflare Worker qui appelle l'API de Claude pour la photo du WOD et le coach du jour, sans exposer la clé API. Guide de déploiement dans [`server/README.md`](server/README.md). Pour lancer les tests depuis la racine, installe aussi ses dépendances : `npm ci --prefix server`.
 
 ## Limites connues
 
