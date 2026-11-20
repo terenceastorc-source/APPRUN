@@ -10,6 +10,12 @@ describe('import / export', () => {
     expect(parseImport(exportJson(data, tracks))).toEqual({ data, tracks });
   });
 
+  it("n'exporte pas le code d'accès du serveur IA", () => {
+    const text = exportJson({ ...emptyData(), settings: { maxHr: 190, aiUrl: 'https://x', aiCode: 'super-secret' } });
+    expect(text).not.toContain('super-secret');
+    expect(parseImport(text).data.settings).toEqual({ maxHr: 190, aiUrl: 'https://x' });
+  });
+
   it("accepte l'ancien export v1 et un tableau brut", () => {
     const run = { id: 'r', date: '2026-11-01', distanceMeters: 5000, durationSeconds: 1500, type: 'footing', createdAt: 'c', updatedAt: 'u' };
     expect(parseImport(JSON.stringify({ app: 'apprun', version: 1, runs: [run] })).data.activities[0]!.sport).toBe('course');

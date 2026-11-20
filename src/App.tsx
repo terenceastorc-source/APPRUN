@@ -10,6 +10,7 @@ import { PROGRESS_TABS, ProgressView, type ProgressTab } from './components/Prog
 import { SettingsView } from './components/SettingsView';
 import { SportPicker } from './components/SportPicker';
 import { TimerView } from './components/TimerView';
+import { takePrefill } from './components/WodPhoto';
 import { isSportId } from './domain/sports';
 import { TIMER_MODES, type TimerMode } from './domain/timer';
 import { WOD_FORMATS, type WodFormat } from './domain/types';
@@ -44,7 +45,7 @@ export function App({ database }: { database?: Database }) {
 
   switch (section) {
     case '':
-      content = <Dashboard data={store.data} activities={store.activities} />;
+      content = <Dashboard data={store.data} activities={store.activities} onPlan={(p) => (store.addPlan(p), setFlash('Séance ajoutée au plan 📅'))} />;
       break;
     case 'journal':
       title = 'Journal';
@@ -53,18 +54,20 @@ export function App({ database }: { database?: Database }) {
     case 'ajouter': {
       if (!id || !isSportId(id)) {
         title = 'Nouvelle séance';
-        content = <SportPicker />;
+        content = <SportPicker settings={store.data.settings} />;
         break;
       }
       const plan = store.data.plans.find((p) => p.id === route.query.get('plan'));
       const q = route.query;
       const format = q.get('format');
-      const prefill = {
+      const prefill = q.has('photo')
+        ? takePrefill()
+        : {
         title: q.get('titre') ?? undefined,
         durationSeconds: Number(q.get('duree')) || undefined,
         format: format && (WOD_FORMATS as readonly string[]).includes(format) ? (format as WodFormat) : undefined,
         score: q.get('score') ?? undefined,
-      };
+          };
       title = plan ? 'Valider la séance' : 'Nouvelle séance';
       back = plan ? '/plan' : '/ajouter';
       content = (

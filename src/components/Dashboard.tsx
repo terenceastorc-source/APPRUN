@@ -4,9 +4,10 @@ import { LOAD_STATUS_LABELS, loadHistory, loadState } from '../domain/load';
 import { benchmarkRecords, enduranceHighlights, liftRecords, raceRecords, runRecords } from '../domain/records';
 import { CATEGORIES, CATEGORY_LABELS, SPORTS } from '../domain/sports';
 import { bySport, inPeriod, totals, weekStreak, weeklyByCategory } from '../domain/stats';
-import type { AppData, Activity } from '../domain/types';
+import type { AppData, Activity, PlannedSession } from '../domain/types';
 import { navigate } from '../hooks/useRoute';
 import { ActivityCard } from './ActivityCard';
+import { CoachCard } from './CoachCard';
 import { LineChart, ProgressBar, StackedBarChart } from './charts';
 import { Card, Empty } from './ui';
 
@@ -17,6 +18,7 @@ const longDate = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'shor
 interface Props {
   data: AppData;
   activities: Activity[];
+  onPlan(plan: Omit<PlannedSession, 'id'>): void;
   today?: Date;
 }
 
@@ -30,7 +32,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   );
 }
 
-export function Dashboard({ data, activities, today = new Date() }: Props) {
+export function Dashboard({ data, activities, onPlan, today = new Date() }: Props) {
   if (activities.length === 0 && data.plans.length === 0) {
     return (
       <section className="card empty">
@@ -96,6 +98,8 @@ export function Dashboard({ data, activities, today = new Date() }: Props) {
           <span aria-hidden="true">📈</span>Progrès
         </button>
       </nav>
+
+      <CoachCard data={data} onPlan={onPlan} today={today} />
 
       <Card title="Forme et charge" action={<span className={`status status-${load.status}`}>{LOAD_STATUS_LABELS[load.status]}</span>}>
         <p className="muted small">

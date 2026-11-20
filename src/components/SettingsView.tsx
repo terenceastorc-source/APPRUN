@@ -3,6 +3,7 @@ import { toIsoDate } from '../domain/format';
 import type { Store } from '../hooks/useStore';
 import { exportCsv, exportJson, ImportError, parseImport } from '../storage/exchange';
 import { trackStore } from '../storage/tracks';
+import { AiError, testAiConnection } from '../ai/client';
 import { Card } from './ui';
 
 function download(filename: string, content: string, mime: string) {
@@ -16,6 +17,9 @@ function download(filename: string, content: string, mime: string) {
 
 export function SettingsView({ store }: { store: Store }) {
   const [maxHr, setMaxHr] = useState(store.data.settings.maxHr?.toString() ?? '');
+  const [aiUrl, setAiUrl] = useState(store.data.settings.aiUrl ?? '');
+  const [aiCode, setAiCode] = useState(store.data.settings.aiCode ?? '');
+  const [testing, setTesting] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const stamp = toIsoDate(new Date());
@@ -59,6 +63,53 @@ export function SettingsView({ store }: { store: Store }) {
           >
             Enregistrer
           </button>
+        </div>
+      </Card>
+
+      <Card title="🧠 Coach IA">
+        <p className="muted small">
+          Photo du WOD et coach du jour passent par ton serveur IA (Cloudflare Worker du dossier <code>server/</code>), qui appelle Claude avec ta clé API. Seules les données nécessaires sont envoyées : la photo, ou un résumé de
+          tes 14 derniers jours.
+        </p>
+        <div className="form">
+          <label>
+            Adresse du serveur
+            <input type="url" inputMode="url" placeholder="https://apprun-ai.ton-compte.workers.dev" value={aiUrl} onChange={(e) => setAiUrl(e.target.value)} />
+          </label>
+          <label>
+            Code d'accès
+            <input type="password" autoComplete="off" value={aiCode} onChange={(e) => setAiCode(e.target.value)} />
+          </label>
+          <div className="actions">
+            <button
+              className="btn"
+              disabled={testing || !aiUrl || !aiCode}
+              onClick={async () => {
+                setTesting(true);
+                try {
+                  await testAiConnection({ aiUrl, aiCode });
+                  setMessage({ kind: 'ok', text: 'Connexion au serveur IA réussie ✓' });
+                } catch (err) {
+                  setMessage({ kind: 'error', text: err instanceof AiError ? err.message : 'Test impossible.' });
+                } finally {
+                  setTesting(false);
+                }
+              }}
+            >
+              {testing ? 'Test…' : 'Tester la connexion'}
+            </button>
+            <button
+              className="btn primary"
+              onClick={() => {
+                const url = aiUrl.trim();
+                if (url && !/^https:\/\/|^http:\/\/(localhost|127\.0\.0\.1)/.test(url)) return setMessage({ kind: 'error', text: "L'adresse doit commencer par https://" });
+                store.updateSettings({ ...store.data.settings, aiUrl: url || undefined, aiCode: aiCode.trim() || undefined });
+                setMessage({ kind: 'ok', text: 'Réglages du coach IA enregistrés.' });
+              }}
+            >
+              Enregistrer
+            </button>
+          </div>
         </div>
       </Card>
 
