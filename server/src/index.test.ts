@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 import { COACH_ADVICE_SCHEMA, WOD_EXTRACTION_SCHEMA } from '../../src/ai/contract';
 import { MODEL, handle, type ClientFactory, type Env } from './index';
 
@@ -8,7 +8,7 @@ const env: Env = { ANTHROPIC_API_KEY: 'sk-test', ACCESS_CODE: 'secret-123', ALLO
 const WOD = { readable: true, title: 'Fran', format: 'for-time', wodName: 'Fran', durationMinutes: 0, workout: '21-15-9\nThrusters 43/29 kg\nPull-ups', lifts: [], note: '', confidence: 'haute' };
 
 function fakeClient(reply: Partial<Anthropic.Beta.BetaMessage> | Error) {
-  const create = vi.fn(async () => {
+  const create = vi.fn(async (_params: unknown) => {
     if (reply instanceof Error) throw reply;
     return { stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(WOD) }], ...reply } as Anthropic.Beta.BetaMessage;
   });
